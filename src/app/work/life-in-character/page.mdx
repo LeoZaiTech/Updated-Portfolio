@@ -1,0 +1,176 @@
+import {
+  CaseStudyLayout,
+  Section,
+  Hero,
+  FlowStrip,
+  Decisions,
+  ArchitectureDiagram,
+} from "@/components/case-study";
+
+export const metadata = {
+  title: "Life In Character — Case Study",
+  description:
+    "A Habitica-inspired RPG habit tracker built as a personal engineering study. React Native, Redux Toolkit, sprite-layered avatars.",
+};
+
+export const meta = {
+  title: "Life In Character",
+  positioning:
+    "A Habitica-inspired RPG habit tracker, built as a personal engineering study in gamification, sprite layering, and Redux-at-scale.",
+  status: { label: "Personal build", tone: "personal" },
+  role: "Solo — design, engineering",
+  stack: [
+    "React Native",
+    "Expo SDK 54",
+    "TypeScript",
+    "Redux Toolkit",
+    "Redux Persist",
+    "AsyncStorage",
+    "React Navigation (Material Top Tabs)",
+  ],
+  timeframe: "2025 – 2026",
+  links: [
+    {
+      label: "GitHub repo",
+      href: "https://github.com/LeoZai613/Life-In-Character",
+    },
+  ],
+};
+
+<CaseStudyLayout meta={meta}>
+
+<Hero
+  src="/work/life-in-character/character.png"
+  alt="Life In Character avatar and stats screen"
+  accent="rgba(56, 189, 248, 0.18)"
+/>
+
+<Section eyebrow="Context" title="Why this exists">
+
+Life In Character is a personal engineering build — not a product. It's a Habitica-inspired RPG habit tracker I built to push on three things: a feature-based Redux architecture large enough to feel real, a sprite-layered avatar system with hundreds of assets, and the gamification mechanics (XP, gold, health, daily reset) that make Habitica work.
+
+The sprite assets are from the open-source [Habitica](https://habitica.com) project, licensed **CC-BY-NC-SA 3.0**. That license is the reason this app can't be commercialized — and it's also the reason the case study exists in the first place. It freed me to build the thing honestly as a study, without product pressure.
+
+</Section>
+
+<Section eyebrow="Key decisions" title="Interesting calls">
+
+<Decisions items={[
+  {
+    title: "Feature-based Redux slices, not a single store",
+    body: "Six separate slices — habits, dailies, todos, player, character, inventory — each with their own selectors and reducers. Easier to reason about, easier to test in isolation, and surfaced a real insight: player state (XP, gold, health) needs to react to events from three other slices, so thunks became the clear boundary.",
+  },
+  {
+    title: "Redux Persist + AsyncStorage, no backend",
+    body: "Everything lives on-device. No account system, no cloud sync. The build rule was 'if it doesn't need a server, it doesn't get one' — which kept the project scope honest and let me focus on the mechanics rather than the plumbing.",
+  },
+  {
+    title: "Three task archetypes from Habitica's model",
+    body: "Habits (flexible positive/negative), Dailies (scheduled with streaks), Todos (one-shot). Tried collapsing them during prototyping — regretted it. The three archetypes exist because they model genuinely different behaviors; merging them made the UI worse, not simpler.",
+  },
+  {
+    title: "Sprite map with 460+ keys, layered avatar renderer",
+    body: "The avatar is a stack of sprite layers — skin, hair, shirt, armor, helmet, weapon, pet — each driven by equipment state in the inventory slice. CharacterAvatar.tsx composes the layers in Z-order so equipping an item updates the render automatically.",
+  },
+  {
+    title: "Daily reset with missed-task penalties",
+    body: "Dailies lose health when missed, which is the single most motivating mechanic in Habitica. Implementing it meant a scheduled check on app open: diff last-reset timestamp against today, apply penalties, reset streaks. Small feature, huge behavior impact.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Flow" title="Five screens, five decisions">
+
+<FlowStrip steps={[
+  {
+    src: "/work/life-in-character/character.png",
+    alt: "Character customization screen",
+    title: "Character",
+    caption: "The avatar is the product. Equipment from the inventory slice renders as Z-ordered sprite layers in real time — buy a helmet, see it immediately.",
+  },
+  {
+    src: "/work/life-in-character/habits.png",
+    alt: "Habits screen",
+    title: "Habits",
+    caption: "Flexible behaviors with +/- buttons and unlimited interactions per day. Hits the player slice on every tap — XP and gold for positive, health damage for negative.",
+  },
+  {
+    src: "/work/life-in-character/dailies.png",
+    alt: "Dailies screen",
+    title: "Dailies",
+    caption: "Scheduled recurring tasks with streak tracking. The real mechanic is what happens when you don't check them: health loss on next app open.",
+  },
+  {
+    src: "/work/life-in-character/todo.png",
+    alt: "Todo list screen",
+    title: "To-Dos",
+    caption: "One-shot tasks with optional due dates. Rewards are bigger than habits or dailies because the cost of completion is higher.",
+  },
+  {
+    src: "/work/life-in-character/rewards.png",
+    alt: "Rewards shop screen",
+    title: "Rewards Shop",
+    caption: "56 purchasable items across four categories — armor, head, weapons, pets. Closes the loop: effort becomes gold becomes avatar becomes motivation to keep going.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Architecture" title="How the pieces fit">
+
+<ArchitectureDiagram
+  layers={[
+    {
+      title: "Presentation",
+      nodes: [
+        { label: "HabitsScreen", detail: "+/- interactions" },
+        { label: "DailiesScreen", detail: "streaks + reset" },
+        { label: "TodosScreen", detail: "one-shot tasks" },
+        { label: "CharacterScreen", detail: "avatar + stats" },
+        { label: "RewardsScreen", detail: "shop + equip" },
+      ],
+    },
+    {
+      title: "Store (Redux Toolkit)",
+      nodes: [
+        { label: "habits/", detail: "slice + selectors" },
+        { label: "dailies/", detail: "slice + selectors" },
+        { label: "todos/", detail: "slice + selectors" },
+        { label: "player/", detail: "xp, gold, health, level" },
+        { label: "character/", detail: "customization" },
+        { label: "inventory/", detail: "items + equipped" },
+      ],
+    },
+    {
+      title: "Rendering",
+      nodes: [
+        { label: "CharacterAvatar", detail: "Z-ordered sprite layers" },
+        { label: "spriteMap.ts", detail: "460+ sprite keys" },
+        { label: "StatsBar", detail: "player state display" },
+      ],
+    },
+    {
+      title: "Persistence",
+      nodes: [
+        { label: "Redux Persist", detail: "slice rehydration" },
+        { label: "AsyncStorage", detail: "device-only" },
+      ],
+    },
+  ]}
+  note="There is no backend. State lives in six slices, persists to AsyncStorage via Redux Persist, and rehydrates on app open. The sprite renderer reads from inventory slice and composes layers automatically — equipping an item is a single dispatch."
+/>
+
+</Section>
+
+<Section eyebrow="What I learned" title="Honest outcome">
+
+The biggest lesson was about scope. Habitica has been shipping for over a decade; my version is a system study, not a rival. Keeping that straight meant resisting feature creep — I don't need parties, challenges, or sync, because the point was to understand how the mechanics hold together, not to compete.
+
+The sprite-layering system was the unexpected win. Building it forced a clean separation between "what's equipped" (inventory slice) and "what's rendered" (presentation layer), and that separation turned out to be the cleanest architecture decision in the project.
+
+**Attribution:** Sprite and pixel-art assets are from the Habitica project (HabitRPG), licensed under [CC-BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/). This project is non-commercial and shares the same license. Source: [LeoZai613/Life-In-Character](https://github.com/LeoZai613/Life-In-Character).
+
+</Section>
+
+</CaseStudyLayout>

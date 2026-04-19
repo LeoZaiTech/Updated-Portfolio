@@ -1,0 +1,173 @@
+import {
+  CaseStudyLayout,
+  Section,
+  Hero,
+  FlowStrip,
+  Decisions,
+  ArchitectureDiagram,
+} from "@/components/case-study";
+
+export const metadata = {
+  title: "Cosmic Solo — Case Study",
+  description:
+    "An AI-powered astrology app that helps you decide, not just scroll. React Native, Expo, and a locally-computed natal chart.",
+};
+
+export const meta = {
+  title: "Cosmic Solo",
+  positioning:
+    "An AI-powered astrology app that helps you decide, not just scroll.",
+  status: { label: "Launching soon", tone: "soon" },
+  role: "Solo — design, engineering, product",
+  stack: [
+    "React Native",
+    "Expo SDK 54",
+    "TypeScript",
+    "Redux Toolkit",
+    "React Navigation 6",
+    "expo-secure-store",
+    "astronomia",
+    "OpenAI",
+    "EAS Build",
+  ],
+  timeframe: "2025 – 2026, ongoing",
+  links: [
+    { label: "App Store", href: "#", disabled: true },
+    {
+      label: "cosmicsolo:// deep link",
+      href: "#",
+      disabled: true,
+    },
+  ],
+};
+
+<CaseStudyLayout meta={meta}>
+
+<Hero
+  src="/work/cosmic-solo/home.png"
+  alt="Cosmic Solo home screen"
+  accent="rgba(194, 65, 12, 0.18)"
+/>
+
+<Section eyebrow="Context" title="Why this exists">
+
+Most astrology apps are horoscope feeds — entertainment tuned for scrolling. When people actually use astrology in their lives, though, they use it to *decide something*: take the job, have the conversation, sign the lease, send the message.
+
+Cosmic Solo is built for that moment. You give it your birth data once, it computes your natal chart locally, and then it lets you ask real questions. The answers are grounded in your chart and today's transits, not a generic "Leos will feel emotional today."
+
+</Section>
+
+<Section eyebrow="Key decisions" title="Interesting calls">
+
+<Decisions items={[
+  {
+    title: "Compute the chart on-device, not in the cloud",
+    body: "Used astronomia for planetary positions rather than routing birth data to a paid API. Lower latency, no third-party handling of birth date/time/location, and a meaningfully cheaper unit cost per user. Trade-off: larger bundle and no server-side backfill — acceptable for a consumer app.",
+  },
+  {
+    title: "Open-ended questions, not preset prompts",
+    body: "The first prototype had a list of canned questions (\"Should I take this job?\"). It tested poorly — people want to ask their own thing. Shipping the free-form Ask screen meant wiring the user's full chart state into the prompt, but kept the product honest to how people actually think.",
+  },
+  {
+    title: "Secure storage for birth data",
+    body: "Birth date/time/location is the most identifying thing the app ever touches. Put it behind expo-secure-store rather than AsyncStorage, even though the app runs offline and never transmits it.",
+  },
+  {
+    title: "Three EAS environments from day one",
+    body: "dev / preview / production with distinct bundle IDs. Friction up front, but I can hand TestFlight builds to friends without worrying about data collision with my local dev installs. OTA updates via EAS Update on the preview track.",
+  },
+  {
+    title: "Deep linking scheme early",
+    body: "cosmicsolo:// routes to every major screen (home, chart, ask, calendar, profile, onboarding). Costs nothing to add now; would be painful to retrofit later when I want to share \"here's what today looks like for you\" links.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Flow" title="Five screens, five decisions">
+
+<FlowStrip steps={[
+  {
+    src: "/work/cosmic-solo/home.png",
+    alt: "Cosmic Solo home screen",
+    title: "Home",
+    caption: "The daily view answers one question first — what's today actually about — before offering anything else. Transits are ranked by impact on the user's chart, not alphabetically.",
+  },
+  {
+    src: "/work/cosmic-solo/chart.png",
+    alt: "Cosmic Solo birth chart",
+    title: "Chart",
+    caption: "Full natal chart rendered from on-device computation. Tapping any planet or house opens a plain-English explanation rather than jargon — the bet is that beginners outnumber experts.",
+  },
+  {
+    src: "/work/cosmic-solo/ask.png",
+    alt: "Ask The Cosmos input screen",
+    title: "Ask The Cosmos",
+    caption: "Free-form input. The prompt that goes to the model includes the user's natal chart, today's transits, and the question — not the question alone. That's why the answers feel specific.",
+  },
+  {
+    src: "/work/cosmic-solo/calendar.png",
+    alt: "Cosmic Solo calendar",
+    title: "Calendar",
+    caption: "Timing matters as much as the decision. The calendar surfaces favorable and unfavorable days for categories the user cares about, not every aspect that fires.",
+  },
+  {
+    src: "/work/cosmic-solo/profile.png",
+    alt: "Cosmic Solo profile screen",
+    title: "Profile",
+    caption: "Birth data lives here, behind secure storage. One profile for now; the architecture already supports multiple charts for compatibility readings, gated behind a later feature flag.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Architecture" title="How the pieces fit">
+
+<ArchitectureDiagram
+  layers={[
+    {
+      title: "Input & identity",
+      nodes: [
+        { label: "Onboarding", detail: "birth date / time / location" },
+        { label: "expo-secure-store", detail: "encrypted at rest" },
+      ],
+    },
+    {
+      title: "Chart engine (on device)",
+      nodes: [
+        { label: "astronomia", detail: "planetary positions" },
+        { label: "Natal chart", detail: "houses, aspects" },
+        { label: "Transit engine", detail: "today vs. natal" },
+      ],
+    },
+    {
+      title: "State & navigation",
+      nodes: [
+        { label: "Redux Toolkit", detail: "feature slices" },
+        { label: "redux-persist", detail: "session restore" },
+        { label: "React Navigation 6", detail: "stack + tabs" },
+      ],
+    },
+    {
+      title: "Guidance",
+      nodes: [
+        { label: "Prompt builder", detail: "chart + transits + question" },
+        { label: "OpenAI API", detail: "response grounding" },
+        { label: "Ask / Calendar / Home", detail: "display surfaces" },
+      ],
+    },
+  ]}
+  note="Everything above the guidance layer runs on-device. The only network call is the grounded prompt to the language model — no birth data leaves the phone in plain text."
+/>
+
+</Section>
+
+<Section eyebrow="What I learned" title="Honest outcome">
+
+Publishing-ready is further than I'd hoped. The engine works, the flows feel right, and the UI holds up — but the long tail of App Store readiness (privacy policy wording, delete-account flow, rate limits, crash-free onboarding on older devices) is its own project. I'd rather ship it honestly than ship it fast.
+
+The thing I'd tell someone building the same type of app: resist the urge to gate everything behind an account. On-device chart computation plus a single profile got me 90% of the product at 10% of the backend cost. The account system can come when it's needed for a feature users actually ask for, not for a growth funnel.
+
+</Section>
+
+</CaseStudyLayout>
