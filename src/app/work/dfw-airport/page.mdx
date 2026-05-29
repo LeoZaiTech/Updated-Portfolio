@@ -1,0 +1,161 @@
+import {
+  CaseStudyLayout,
+  Section,
+  Decisions,
+  ArchitectureDiagram,
+} from "@/components/case-study";
+
+export const metadata = {
+  title: "DFW Airport — Case Study",
+  description:
+    "An offline-first iPad field operations app for Dallas Fort Worth International Airport. React Native, Expo, ArcGIS, encrypted GPS breadcrumbs, 150+ managed devices.",
+};
+
+export const meta = {
+  title: "DFW Airport",
+  positioning:
+    "An offline-first iPad field ops app for 100+ airport technicians. React Native and Expo, with ArcGIS map workflows, background GPS breadcrumbs, and a Hexagon EAM integration that has to keep working when the network doesn't.",
+  status: { label: "Live", tone: "live" },
+  role: "Senior React Native Developer — mobile architecture & implementation",
+  stack: [
+    "React Native",
+    "Expo 53",
+    "React 19",
+    "TypeScript",
+    "expo-router",
+    "Zustand",
+    "React Query",
+    "AsyncStorage",
+    "expo-crypto",
+    "ArcGIS Maps SDK (WebView)",
+    "expo-location",
+    "expo-task-manager",
+    "expo-background-task",
+    "Hexagon EAM",
+  ],
+  timeframe: "2025 — Contract",
+  links: [
+    {
+      label: "Deployed via ABM + Intune MDM",
+      href: "#",
+      disabled: true,
+    },
+  ],
+};
+
+<CaseStudyLayout meta={meta}>
+
+<Section eyebrow="Context" title="Why this exists">
+
+DFW International Airport runs on a few hundred technicians moving across thousands of acres of property every day. Work orders, asset locations, photo evidence, and timing all matter — and the network on the airfield is not the network in the office. Cellular drops between terminals, Wi-Fi is patchy in maintenance yards, and a tech mid-work order doesn't get to stop and wait.
+
+The app is the field interface for that whole operation. iPad-first, deployed through ABM and Intune, used by 100+ technicians handling 200+ daily work orders. My contract was to own the parts of the mobile architecture that determine whether it works in real conditions or only in demos: offline behavior, GPS, map workflows, and the integration with Hexagon EAM on the back end.
+
+This is not a consumer app. It's a piece of operational infrastructure where a five-second freeze in the field is a real problem and a lost work order is a much bigger one.
+
+</Section>
+
+<Section eyebrow="Key decisions" title="Interesting calls">
+
+<Decisions items={[
+  {
+    title: "Treat 'no internet' and 'API unhealthy' as different states",
+    body: "Most field apps collapse them into a single offline banner. We separated them: the device tracks connectivity independently from a backend health check, and the UI shows the correct banner with the correct cached data. A tech in a dead zone gets a different message — and a different escape hatch — than a tech whose request timed out against a sick API.",
+  },
+  {
+    title: "Offline-first by default, not as a feature flag",
+    body: "Assignments and work orders cache to encrypted local storage on every successful fetch. Job completions, comments, and document uploads queue locally with retry. The default code path on every screen assumes the network is gone; the online path is a fast-path optimization layered on top.",
+  },
+  {
+    title: "ArcGIS via custom WebView components",
+    body: "We needed the full Esri JS API surface — work-order markers by type, sequence-aware rendering, edit-mode coordinate adjustments, recentering on the latest breadcrumb. Rather than fight a thin native wrapper, we wrapped the JS SDK in custom WebView components and memoized the bridge payloads. Trade-off was message-passing overhead, paid back by being able to ship complex map behaviors without waiting on a native module.",
+  },
+  {
+    title: "Background GPS via expo-task-manager + expo-background-task",
+    body: "The breadcrumb service captures every 5 minutes or 50 meters of movement, classifies activity from speed, retains 7 days, caps at 10,000 records, and batches uploads when connectivity returns. Built on Expo's documented background-task lifecycle rather than a sidecar native module — predictable OS behavior was worth more than raw control.",
+  },
+  {
+    title: "Encrypt local data with expo-crypto",
+    body: "Work-order data and breadcrumbs are operationally sensitive — the device is shared, sometimes lost, and lives inside a managed MDM fleet. Local storage is encrypted at rest with expo-crypto, not AsyncStorage in the clear, even though MDM provides device-level encryption already. Defense in depth.",
+  },
+  {
+    title: "iPad-first, not a stretched phone layout",
+    body: "Workflow was designed for sustained two-handed iPad use in the field, not a phone layout zoomed up. Map and work-order detail share the screen; photo capture and checklists open as modal layers rather than full screens. The UX assumption is that the tech's hands are busy and the device is propped or held in landscape.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Architecture" title="How the pieces fit">
+
+<ArchitectureDiagram
+  layers={[
+    {
+      title: "Field UX",
+      nodes: [
+        { label: "Map screen", detail: "work orders + breadcrumb HUD" },
+        { label: "Work order detail", detail: "checklist + photos" },
+        { label: "Photo capture", detail: "multipart upload" },
+        { label: "Offline / API banners", detail: "two distinct states" },
+      ],
+    },
+    {
+      title: "State & sync",
+      nodes: [
+        { label: "Zustand", detail: "session + UI state" },
+        { label: "React Query", detail: "server state + retry" },
+        { label: "Offline queue", detail: "completions, comments, docs" },
+        { label: "AsyncStorage + expo-crypto", detail: "encrypted local cache" },
+      ],
+    },
+    {
+      title: "Location & background",
+      nodes: [
+        { label: "expo-location", detail: "permissions + foreground GPS" },
+        { label: "expo-task-manager", detail: "registered background tasks" },
+        { label: "expo-background-task", detail: "fetch + upload" },
+        { label: "Breadcrumb service", detail: "distance + speed classification" },
+      ],
+    },
+    {
+      title: "Maps & integration",
+      nodes: [
+        { label: "ArcGIS WebView", detail: "custom marker rendering" },
+        { label: "Hexagon EAM API", detail: "work orders, comments, checklists" },
+        { label: "Document upload", detail: "multipart form data" },
+        { label: "Network + health probes", detail: "two-state connectivity" },
+      ],
+    },
+  ]}
+  note="The offline-first layer sits between the UI and every network call. Screens read cached state first, then reconcile with React Query results when they arrive. The breadcrumb service runs on its own clock — distance and speed thresholds rather than wall-clock polling — and its background-task registration is what keeps location capture honest when the app isn't in the foreground."
+/>
+
+</Section>
+
+<Section eyebrow="Results" title="What the deployment showed">
+
+The numbers below are from operational reporting after rollout to the managed iPad fleet:
+
+- **100+ field technicians** using the app daily
+- **200+ daily work orders** flowing through the mobile interface
+- **35% improvement** in technician productivity
+- **80% reduction** in equipment lookup time
+- **99.5% uptime** in production
+- **Zero data loss** across deployment
+- **150+ iPads** deployed through Apple Business Manager + Microsoft Intune MDM
+
+The results matter less than what they imply: the offline-first work paid for itself. Techs don't lose work when the network drops, the queue catches everything, and the GPS breadcrumb record is intact when it's needed.
+
+</Section>
+
+<Section eyebrow="What I learned" title="Honest outcome">
+
+The hardest part of this project wasn't any single feature — it was holding the offline-first discipline across every code path. Anyone can build an offline screen as a special case. The architecture only works when the default assumption on every fetch, every mutation, every navigation event is that the network may be gone. That's the discipline I'd carry into any field-ops or enterprise mobile project after this one.
+
+The other thing I'd tell someone starting a similar build: separate connectivity from backend health early. Pretending they're the same state is the single most common shortcut in field apps, and it's the one that produces angry users in dead zones who can't tell whether they're offline or the system is broken.
+
+Imagery is omitted by request — this is a deployed enterprise project under operational confidentiality. The architecture above is what the codebase looks like; the screenshots stay in the MDM fleet.
+
+</Section>
+
+</CaseStudyLayout>

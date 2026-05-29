@@ -54,6 +54,7 @@ const experience: ExperienceEntry[] = [
     role: "Senior React Native Developer · Contract",
     timeframe: "2025",
     note: "Next-generation field ops app. ArcGIS migration, offline-first architecture, encrypted GPS breadcrumbs. 150+ iPads deployed.",
+    href: "/work/dfw-airport",
   },
   {
     company: "Emcee",

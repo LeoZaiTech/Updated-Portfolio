@@ -1,8 +1,11 @@
+import Link from "next/link";
+
 export type ExperienceEntry = {
   company: string;
   role: string;
   timeframe: string;
   note: string;
+  href?: string;
 };
 
 export function Experience({ entries }: { entries: ExperienceEntry[] }) {
@@ -29,6 +32,14 @@ export function Experience({ entries }: { entries: ExperienceEntry[] }) {
             <div className="col-span-2 text-sm text-[color:var(--foreground)] md:col-span-1">
               <div className="text-[color:var(--muted)]">{entry.role}</div>
               <div className="mt-1">{entry.note}</div>
+              {entry.href && (
+                <Link
+                  href={entry.href}
+                  className="mt-3 inline-flex items-center gap-1 font-mono text-xs uppercase tracking-[0.16em] text-[color:var(--muted)] transition hover:text-[color:var(--accent)]"
+                >
+                  Read case study <span aria-hidden>→</span>
+                </Link>
+              )}
             </div>
             <div className="hidden font-mono text-xs uppercase tracking-[0.14em] text-[color:var(--muted)] md:block md:text-right">
               {entry.timeframe}
