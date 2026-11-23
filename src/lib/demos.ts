@@ -5,7 +5,7 @@
 // in the visitor's browser. To add one, deploy it somewhere of its own and add
 // it here. LaunchDemo refuses any address whose origin is not in this list.
 export type Demo = {
-  /** the demo's address; empty until the demo has been deployed */
+  /** the demo's address; leave it empty to hide a demo that is not deployed */
   url: string;
   /** what the address bar of the frame shows */
   label: string;
@@ -17,9 +17,8 @@ export const demos = {
     label: "fretboard-l.netlify.app",
   },
   cosmicSolo: {
-    // set once the web demo has a site of its own (see the case study)
-    url: "",
-    label: "",
+    url: "https://cosmic-solo-demo.netlify.app/",
+    label: "cosmic-solo-demo.netlify.app",
   },
 } satisfies Record<string, Demo>;
 
