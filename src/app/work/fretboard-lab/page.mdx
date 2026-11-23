@@ -1,0 +1,183 @@
+import {
+  CaseStudyLayout,
+  Section,
+  Hero,
+  LaunchDemo,
+  ShotGrid,
+  Decisions,
+  ArchitectureDiagram,
+} from "@/components/case-study";
+import { demos } from "@/lib/demos";
+
+export const metadata = {
+  title: "Fretboard Lab — Case Study",
+  description:
+    "Chords and scales on the neck, a four-lane timeline you can play back, and MIDI export. A practice and writing tool that runs entirely in the browser.",
+};
+
+export const meta = {
+  title: "Fretboard Lab",
+  positioning:
+    "Chords and scales on the neck, a four-lane timeline you can play back, and MIDI export.",
+  status: { label: "Live demo", tone: "live" },
+  role: "Solo — product, direction and review; built with AI coding agents",
+  stack: [
+    "TypeScript",
+    "JavaScript (ES modules)",
+    "tonal",
+    "Web Audio",
+    "Standard MIDI Files",
+    "Vitest",
+    "Netlify",
+  ],
+  timeframe: "Oct – Nov 2026, ongoing",
+  links: [{ label: "Open the demo", href: demos.fretboardLab.url }],
+};
+
+<CaseStudyLayout meta={meta}>
+
+<Hero
+  frame="browser"
+  label={demos.fretboardLab.label}
+  src="/work/fretboard-lab/hero.png"
+  alt="Fretboard Lab: a four-lane timeline with G, D, Em and C placed, and next-chord suggestions below"
+  accent="rgba(16, 185, 129, 0.16)"
+/>
+
+<Section id="demo" eyebrow="Try it" title="The real thing, in the page" wide>
+
+<LaunchDemo
+  title="Fretboard Lab"
+  url={demos.fretboardLab.url}
+  label={demos.fretboardLab.label}
+  poster={{
+    src: "/work/fretboard-lab/shapes.png",
+    alt: "Fretboard Lab's shape picker: a D major chord on a guitar neck with every playable shape listed",
+    width: 1920,
+    height: 1200,
+  }}
+  note="Runs entirely in your browser: no account and no server. Anything you make is saved in this browser only. Best on a laptop; it works on a phone, with more scrolling."
+/>
+
+</Section>
+
+<Section eyebrow="Context" title="Why this exists">
+
+I teach guitar, and I practice with this page myself. It has widened my own chord vocabulary, which is the best argument I have for it.
+
+Fretboard Lab puts the neck, the key and a timeline on one page. Pick an instrument and a tuning, pick a key, and build sixteen bars across four lanes — chords on one, lead lines on the others. It plays back, loops, slows down for practice, suggests what could come next and why, and exports MIDI so a sketch can carry on in a DAW. I take mine into BandLab.
+
+It is built on <a href="https://github.com/tonaljs/tonal" target="_blank" rel="noreferrer" className="underline decoration-[color:var(--muted)] underline-offset-4 transition hover:text-[color:var(--accent)]">tonal</a>, danigb's open-source music theory library (MIT). The theory of notes, chords and keys is tonal's. Everything about necks, hands, timelines and sound is new.
+
+</Section>
+
+<Section eyebrow="Key decisions" title="Interesting calls">
+
+<Decisions items={[
+  {
+    title: "Extend the library instead of writing around it",
+    body: "The new code lives in five packages beside tonal's own — tuning, fretboard, chord-shape, harmony and timeline — each with its own tests and README. The page only draws what they compute. More ceremony per feature, but every rule about a neck or a bar can be tested without opening a browser.",
+  },
+  {
+    title: "Chord shapes from rules, not a lookup table",
+    body: "Give it a chord name and it works out every way a hand can play it on the strings in front of it, ordered the way shapes are taught. Because nothing is hard-coded to standard guitar tuning, the same code answers for a different tuning, a capo, or another instrument: bass, ukulele, banjo, and cello (which has no frets, so it gets positions instead).",
+  },
+  {
+    title: "One timeline for the screen, the speakers and the file",
+    body: "The timeline knows its tempo, so it can say when every note sounds, in seconds. Playback and MIDI export both read that same answer, and mute and solo apply to both — the file holds what you hear.",
+  },
+  {
+    title: "No build step for the page",
+    body: "The page is plain ES modules and one HTML file. Publishing it means copying files, so the hosted build installs nothing and there is no bundler to break between me and a friend opening a link.",
+  },
+  {
+    title: "Assume the browser might say no",
+    body: "Storage can be blocked, and a page inside a frame gets no prompt, no confirm and sometimes no downloads. So saving falls back to memory, questions are asked in the page itself, and files go out by whichever route the host allows. That is why the demo above can run inside this page.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Flow" title="Four parts of one page" wide>
+
+<ShotGrid shots={[
+  {
+    src: "/work/fretboard-lab/hero.png",
+    alt: "The timeline: four lanes over sixteen bars, with G, D, Em and C on the chords lane",
+    title: "Timeline",
+    caption: "Sixteen bars, four lanes, each one for chords or for lead. Mute, solo and rename per lane; tempo, practice speed, loop, click and count-in up top. Under it, what could come next after the last chord, and what to play over the one under the marker.",
+  },
+  {
+    src: "/work/fretboard-lab/key-chart.png",
+    alt: "The chords of G major as a chart, with triads, sevenths, ninths and a scale for each degree",
+    title: "The key as a chart",
+    caption: "Every degree of the key with its triad, seventh and ninth, where it tends to resolve, and a scale to play over it. Click a chord and it lands at the marker.",
+  },
+  {
+    src: "/work/fretboard-lab/shapes.png",
+    alt: "The shape picker: D major on a guitar neck, a list of playable shapes and a tab diagram",
+    title: "Shapes",
+    caption: "Instrument, tuning, capo and root string, then every playable shape for the chord, on the neck and as a tab diagram. Type frets like xx9777 and it tells you what chord that is.",
+  },
+  {
+    src: "/work/fretboard-lab/necks.png",
+    alt: "Two necks: the D chord on the chords lane and a G arpeggio on the lead lane",
+    title: "On the neck",
+    caption: "One neck per lane, showing the clip that lane is on: the chord being strummed and the line over it. Notes light up as they sound.",
+  },
+]} />
+
+</Section>
+
+<Section eyebrow="Architecture" title="How the pieces fit" wide>
+
+<ArchitectureDiagram
+  layers={[
+    {
+      title: "Theory (tonal, open source)",
+      nodes: [
+        { label: "Notes & intervals", detail: "names, distances, MIDI numbers" },
+        { label: "Chords & scales", detail: "what is in them" },
+        { label: "Keys", detail: "the chords of a key" },
+      ],
+    },
+    {
+      title: "New packages",
+      nodes: [
+        { label: "tuning", detail: "instruments and their strings" },
+        { label: "fretboard", detail: "where notes live on a neck" },
+        { label: "chord-shape", detail: "playable shapes, from rules" },
+        { label: "harmony", detail: "what comes next, what to play over it" },
+        { label: "timeline", detail: "bars, lanes, clips, timing in seconds" },
+      ],
+    },
+    {
+      title: "The page",
+      nodes: [
+        { label: "Timeline view", detail: "edit, undo, copy, loop" },
+        { label: "Shapes & necks", detail: "pick, read and compare" },
+        { label: "Projects & favorites", detail: "browser storage, JSON in and out" },
+      ],
+    },
+    {
+      title: "Out",
+      nodes: [
+        { label: "Web Audio", detail: "playback, click, practice speed" },
+        { label: "MIDI file", detail: "what you hear, as a .mid" },
+      ],
+    },
+  ]}
+  note="Everything runs in the browser. There is no server and no account, and the page makes no network calls once it has loaded."
+/>
+
+</Section>
+
+<Section eyebrow="Where it stands" title="Honest outcome">
+
+It is a working build that I have shared by link with a few musician friends for feedback. 554 automated tests cover the new packages and the page; with the library's own, the repository runs 878.
+
+It was built with AI coding agents, one feature at a time. My part was the brief for each feature, reviewing what came back, and testing it myself before it was merged.
+
+</Section>
+
+</CaseStudyLayout>

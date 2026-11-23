@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 export type CaseStudyStatus =
   | { label: "Live"; tone: "live" }
+  | { label: "Live demo"; tone: "live" }
   | { label: "Launching soon"; tone: "soon" }
   | { label: "Personal build"; tone: "personal" }
   | { label: "In development"; tone: "soon" };

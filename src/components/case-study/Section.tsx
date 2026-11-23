@@ -3,14 +3,23 @@ import type { ReactNode } from "react";
 export function Section({
   eyebrow,
   title,
+  id,
+  wide = false,
   children,
 }: {
   eyebrow: string;
   title?: string;
+  /** an anchor for links from elsewhere, e.g. "demo" */
+  id?: string;
+  /** let the content use the full column, for frames and screenshot grids */
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className="grid gap-10 md:grid-cols-[12rem_1fr] md:gap-16">
+    <section
+      id={id}
+      className="grid scroll-mt-16 gap-10 md:grid-cols-[12rem_1fr] md:gap-16"
+    >
       <header>
         <div className="font-mono text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">
           {eyebrow}
@@ -21,7 +30,9 @@ export function Section({
           </h2>
         )}
       </header>
-      <div className="max-w-[46rem] space-y-6 text-lg leading-relaxed text-[color:var(--foreground)] [&_p]:text-lg [&_p]:leading-relaxed">
+      <div
+        className={`${wide ? "" : "max-w-[46rem] "}min-w-0 space-y-6 text-lg leading-relaxed text-[color:var(--foreground)] [&_p]:text-lg [&_p]:leading-relaxed`}
+      >
         {children}
       </div>
     </section>

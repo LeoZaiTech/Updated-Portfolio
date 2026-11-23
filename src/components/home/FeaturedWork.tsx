@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrowserFrame } from "@/components/case-study/BrowserFrame";
 import { DeviceFrame } from "@/components/case-study/DeviceFrame";
 
 export type FeaturedProject = {
@@ -11,6 +12,10 @@ export type FeaturedProject = {
   heroSrc: string;
   heroAlt: string;
   accent: string;
+  /** a phone screenshot (the default), or a wide one in a browser window */
+  frame?: "phone" | "browser";
+  /** a live demo to link to beside the case study */
+  demo?: { url: string; label: string };
 };
 
 export function FeaturedWork({ projects }: { projects: FeaturedProject[] }) {
@@ -22,7 +27,7 @@ export function FeaturedWork({ projects }: { projects: FeaturedProject[] }) {
             Featured work
           </div>
           <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-light leading-tight md:text-4xl">
-            Two apps I built, front to back.
+            Things I built, front to back.
           </h2>
         </div>
       </div>
@@ -46,7 +51,7 @@ function Spotlight({
   return (
     <article className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
       <div
-        className={`relative overflow-hidden rounded-3xl border border-[color:var(--rule)] bg-[color:var(--surface)] p-8 md:p-12 ${reversed ? "md:order-2" : ""}`}
+        className={`relative overflow-hidden rounded-3xl border border-[color:var(--rule)] bg-[color:var(--surface)] ${project.frame === "browser" ? "p-5 md:p-8" : "p-8 md:p-12"} ${reversed ? "md:order-2" : ""}`}
       >
         <div
           aria-hidden
@@ -56,11 +61,19 @@ function Spotlight({
           }}
         />
         <div className="relative flex justify-center">
-          <DeviceFrame
-            src={project.heroSrc}
-            alt={project.heroAlt}
-            size="md"
-          />
+          {project.frame === "browser" ? (
+            <BrowserFrame
+              src={project.heroSrc}
+              alt={project.heroAlt}
+              label={project.demo?.label}
+            />
+          ) : (
+            <DeviceFrame
+              src={project.heroSrc}
+              alt={project.heroAlt}
+              size="md"
+            />
+          )}
         </div>
       </div>
 
@@ -90,12 +103,22 @@ function Spotlight({
           </div>
         </dl>
 
-        <Link
-          href={`/work/${project.slug}`}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-[color:var(--foreground)] px-5 py-2.5 text-sm text-[color:var(--background)] transition hover:bg-[color:var(--accent)]"
-        >
-          Read case study <span aria-hidden>→</span>
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Link
+            href={`/work/${project.slug}`}
+            className="inline-flex items-center gap-2 rounded-full bg-[color:var(--foreground)] px-5 py-2.5 text-sm text-[color:var(--background)] transition hover:bg-[color:var(--accent)]"
+          >
+            Read case study <span aria-hidden>→</span>
+          </Link>
+          {project.demo?.url && (
+            <Link
+              href={`/work/${project.slug}#demo`}
+              className="text-sm text-[color:var(--muted)] underline-offset-4 transition hover:text-[color:var(--accent)] hover:underline"
+            >
+              Try the live demo
+            </Link>
+          )}
+        </div>
       </div>
     </article>
   );

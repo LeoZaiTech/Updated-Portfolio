@@ -7,13 +7,15 @@ import {
   Experience,
   type ExperienceEntry,
 } from "@/components/home/Experience";
+import { MoreBuilds, type Build } from "@/components/home/MoreBuilds";
+import { demos } from "@/lib/demos";
 
 const projects: FeaturedProject[] = [
   {
     slug: "cosmic-solo",
     title: "Cosmic Solo",
     positioning:
-      "An AI-powered astrology app that helps you decide, not just scroll. On-device natal chart computation and grounded guidance.",
+      "An astrology app that helps you decide, not just scroll. Your chart and the transits to it are computed on the device, and every answer is built from them.",
     status: { label: "Launching soon", tone: "soon" },
     role: "Solo — design, engineering, product",
     stack: [
@@ -22,11 +24,33 @@ const projects: FeaturedProject[] = [
       "TypeScript",
       "Redux Toolkit",
       "astronomia",
-      "OpenAI",
+      "Vitest",
     ],
     heroSrc: "/work/cosmic-solo/home.png",
     heroAlt: "Cosmic Solo home screen",
     accent: "rgba(194, 65, 12, 0.22)",
+    demo: demos.cosmicSolo,
+  },
+  {
+    slug: "fretboard-lab",
+    title: "Fretboard Lab",
+    positioning:
+      "Chords and scales on the neck, a four-lane timeline you can play back, and MIDI export. A practice and writing tool for guitar, bass, ukulele, banjo and cello that runs entirely in the browser.",
+    status: { label: "Live demo", tone: "live" },
+    role: "Solo — product, direction and review; built with AI coding agents",
+    stack: [
+      "TypeScript",
+      "JavaScript (ES modules)",
+      "tonal",
+      "Web Audio",
+      "Vitest",
+    ],
+    heroSrc: "/work/fretboard-lab/hero.png",
+    heroAlt:
+      "Fretboard Lab: a four-lane timeline with G, D, Em and C placed, and the chords of G major below",
+    accent: "rgba(16, 185, 129, 0.2)",
+    frame: "browser",
+    demo: demos.fretboardLab,
   },
   {
     slug: "life-in-character",
@@ -45,6 +69,38 @@ const projects: FeaturedProject[] = [
     heroSrc: "/work/life-in-character/character.png",
     heroAlt: "Life In Character avatar screen",
     accent: "rgba(56, 189, 248, 0.22)",
+  },
+];
+
+const builds: Build[] = [
+  {
+    title: "Fretbridge",
+    kind: "Command-line tool · library",
+    blurb:
+      "Guitar, bass and ukulele tab to MIDI files and back. A file it wrote comes back with the same strings, frets, tuning and capo; any other MIDI file gets fingerings picked for playability. No third-party code.",
+    stack: ["C++20", "CMake"],
+  },
+  {
+    title: "Job Optimizer",
+    kind: "Local dashboard",
+    blurb:
+      "Narrows a job search: imports roles from Greenhouse, Lever and Ashby boards, scores them against a profile, tracks every application, and checks a resume against a posting. No build step, and a review-first autofill that only submits on confirmation.",
+    stack: ["JavaScript", "Node 22", "Playwright"],
+  },
+  {
+    title: "Tidestrike",
+    kind: "Browser game · early prototype",
+    blurb:
+      "A single-page arena sports game: build a roster, scout new talent, and play them through league matches. One TypeScript file compiled with tsc, a Three.js arena, no backend, saves in the browser.",
+    stack: ["TypeScript", "Three.js"],
+  },
+  {
+    title: "Pain Olympics",
+    kind: "Card game · prototype",
+    blurb:
+      "A dark-humor card game about personalized decks and disputing the other player's hand. Build a 40-card deck and face a themed computer rival, or play a friend on the same browser.",
+    stack: ["HTML", "CSS", "JavaScript", "Node"],
+    href: "https://github.com/LeoZaiTech/Pain-Olympics",
   },
 ];
 
@@ -142,6 +198,10 @@ export default function Home() {
 
       <div id="work" className="scroll-mt-16 py-16">
         <FeaturedWork projects={projects} />
+      </div>
+
+      <div id="builds" className="scroll-mt-16 py-16">
+        <MoreBuilds builds={builds} />
       </div>
 
       <div id="experience" className="scroll-mt-16 py-16">

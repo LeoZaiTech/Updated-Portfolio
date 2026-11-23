@@ -2,21 +2,23 @@ import {
   CaseStudyLayout,
   Section,
   Hero,
+  LaunchDemo,
   FlowStrip,
   Decisions,
   ArchitectureDiagram,
 } from "@/components/case-study";
+import { demos } from "@/lib/demos";
 
 export const metadata = {
   title: "Cosmic Solo — Case Study",
   description:
-    "An AI-powered astrology app that helps you decide, not just scroll. React Native, Expo, and a locally-computed natal chart.",
+    "An astrology app that helps you decide, not just scroll. React Native, Expo, and a chart computed on the device.",
 };
 
 export const meta = {
   title: "Cosmic Solo",
   positioning:
-    "An AI-powered astrology app that helps you decide, not just scroll.",
+    "An astrology app that helps you decide, not just scroll.",
   status: { label: "Launching soon", tone: "soon" },
   role: "Solo — design, engineering, product",
   stack: [
@@ -27,11 +29,14 @@ export const meta = {
     "React Navigation 6",
     "expo-secure-store",
     "astronomia",
-    "OpenAI",
+    "Vitest",
     "EAS Build",
   ],
   timeframe: "2025 – 2026, ongoing",
   links: [
+    ...(demos.cosmicSolo.url
+      ? [{ label: "Open the web demo", href: demos.cosmicSolo.url }]
+      : []),
     { label: "App Store", href: "#", disabled: true },
     {
       label: "cosmicsolo:// deep link",
@@ -48,6 +53,24 @@ export const meta = {
   alt="Cosmic Solo home screen"
   accent="rgba(194, 65, 12, 0.18)"
 />
+
+{demos.cosmicSolo.url ? (
+  <Section id="demo" eyebrow="Try it" title="The app, in your browser" wide>
+    <LaunchDemo
+      title="Cosmic Solo"
+      url={demos.cosmicSolo.url}
+      label={demos.cosmicSolo.label}
+      shape="phone"
+      poster={{
+        src: "/work/cosmic-solo/chart.png",
+        alt: "Cosmic Solo's chart screen",
+        width: 1170,
+        height: 2532,
+      }}
+      note="A web build of the same app. It runs entirely in your browser: the birth details you enter stay in this browser and are not sent anywhere. The optional AI writer is switched off in this demo."
+    />
+  </Section>
+) : null}
 
 <Section eyebrow="Context" title="Why this exists">
 
@@ -66,7 +89,23 @@ Cosmic Solo is built for that moment. You give it your birth data once, it compu
   },
   {
     title: "Open-ended questions, not preset prompts",
-    body: "The first prototype had a list of canned questions (\"Should I take this job?\"). It tested poorly — people want to ask their own thing. Shipping the free-form Ask screen meant wiring the user's full chart state into the prompt, but kept the product honest to how people actually think.",
+    body: "The first prototype had a list of canned questions (\"Should I take this job?\"). It tested poorly — people want to ask their own thing. Shipping the free-form Ask screen meant the app has to read any question: which area of life it is about, whether it is a decision or a timing question, and what window of time it means.",
+  },
+  {
+    title: "Answers come from an engine, not a model",
+    body: "Ask gathers its evidence as data — the natal placements that rule the area, the transits in the window weighted by relevance, a score for every day — then writes the verdict, the guidance and the dates from it. The same question on the same day gets the same answer, and follow-ups like \"why?\", \"what about next week?\" or \"what's the worst day?\" read the same evidence instead of starting over.",
+  },
+  {
+    title: "The AI writer is optional, off by default, and fenced in",
+    body: "With nothing configured, Ask works exactly as above. Turn the writer on with your own key for any OpenAI-compatible endpoint and a model rewrites the answer — but it is handed only a numbered fact sheet, and a deterministic validator checks every claim in its draft (a body in a sign, a degree, an aspect, a house, a date, a retrograde) against that sheet. One violation rejects the draft; it gets one rewrite, and if that fails too the built-in answer stands.",
+  },
+  {
+    title: "Decide what not to answer first",
+    body: "Every message passes a scope check before anything else. Signs that someone may be in danger get a caring reply that points to real help — no astrology, no verdict, and never a model. Medical decisions, predictions, other people's feelings and gambling get an honest \"the chart can't tell you that\". A verdict needs positive evidence that the question is an ordinary life decision.",
+  },
+  {
+    title: "Check the math against a reference",
+    body: "Chart, transit and compatibility calculations are tested against fixtures generated with Swiss Ephemeris: 93 birth charts, planet positions across dates, the year's lunations and ingresses, and cross-chart aspects for pairs of charts. The suite is 1,449 tests and runs offline.",
   },
   {
     title: "Secure storage for birth data",
@@ -84,7 +123,7 @@ Cosmic Solo is built for that moment. You give it your birth data once, it compu
 
 </Section>
 
-<Section eyebrow="Flow" title="Five screens, five decisions">
+<Section eyebrow="Flow" title="Six screens, six decisions">
 
 <FlowStrip steps={[
   {
@@ -97,25 +136,31 @@ Cosmic Solo is built for that moment. You give it your birth data once, it compu
     src: "/work/cosmic-solo/chart.png",
     alt: "Cosmic Solo birth chart",
     title: "Chart",
-    caption: "Full natal chart rendered from on-device computation. Tapping any planet or house opens a plain-English explanation rather than jargon — the bet is that beginners outnumber experts.",
+    caption: "The big three, the four angles and every placement, computed on the device. Each row says what the point is in plain English rather than jargon — the bet is that beginners outnumber experts.",
+  },
+  {
+    src: "/work/cosmic-solo/placement.png",
+    alt: "A placement explained: Taurus rising",
+    title: "Tap a placement",
+    caption: "Any placement opens an explanation assembled from this chart's own facts: its sign, degree and house, its closest aspects with their orbs, where its ruler sits. Two people with the same Sun sign read differently.",
   },
   {
     src: "/work/cosmic-solo/ask.png",
-    alt: "Ask The Cosmos input screen",
-    title: "Ask The Cosmos",
-    caption: "Free-form input. The prompt that goes to the model includes the user's natal chart, today's transits, and the question — not the question alone. That's why the answers feel specific.",
+    alt: "Ask: a question about a job offer answered with a verdict and the transits behind it",
+    title: "Ask",
+    caption: "Free-form input, answered as a conversation. A verdict up top, the transits it rests on, concrete dates — and follow-ups like \"why?\" or \"what about next week?\" pick up the thread.",
   },
   {
     src: "/work/cosmic-solo/calendar.png",
-    alt: "Cosmic Solo calendar",
+    alt: "Cosmic Solo calendar month grid",
     title: "Calendar",
-    caption: "Timing matters as much as the decision. The calendar surfaces favorable and unfavorable days for categories the user cares about, not every aspect that fires.",
+    caption: "Timing matters as much as the decision. A month grid where each day carries the markers that matter: a strong transit, a new or full moon, a retrograde starting or ending, and the month's best and hardest days.",
   },
   {
-    src: "/work/cosmic-solo/profile.png",
-    alt: "Cosmic Solo profile screen",
-    title: "Profile",
-    caption: "Birth data lives here, behind secure storage. One profile for now; the architecture already supports multiple charts for compatibility readings, gated behind a later feature flag.",
+    src: "/work/cosmic-solo/people.png",
+    alt: "Compatibility: two charts compared",
+    title: "People",
+    caption: "Add someone's birth details and compare charts: every cross-chart aspect and house overlay, ranked, with a plain summary of what flows and what rubs. For reflection and conversation, not a verdict on a relationship.",
   },
 ]} />
 
@@ -138,6 +183,7 @@ Cosmic Solo is built for that moment. You give it your birth data once, it compu
         { label: "astronomia", detail: "planetary positions" },
         { label: "Natal chart", detail: "houses, aspects" },
         { label: "Transit engine", detail: "today vs. natal" },
+        { label: "Synastry", detail: "two charts compared" },
       ],
     },
     {
@@ -151,13 +197,14 @@ Cosmic Solo is built for that moment. You give it your birth data once, it compu
     {
       title: "Guidance",
       nodes: [
-        { label: "Prompt builder", detail: "chart + transits + question" },
-        { label: "OpenAI API", detail: "response grounding" },
-        { label: "Ask / Calendar / Home", detail: "display surfaces" },
+        { label: "Scope check", detail: "what deserves a verdict" },
+        { label: "Ask engine", detail: "evidence → verdict, dates" },
+        { label: "Optional AI writer", detail: "fact sheet in, validated draft out" },
+        { label: "Ask / Calendar / Home / People", detail: "display surfaces" },
       ],
     },
   ]}
-  note="Everything above the guidance layer runs on-device. The only network call is the grounded prompt to the language model — no birth data leaves the phone in plain text."
+  note="Everything runs on the device, guidance included. The only network call is the optional AI writer, which is off by default; when someone turns it on with their own key, it sends the fact sheet for that one answer to the provider they chose."
 />
 
 </Section>
