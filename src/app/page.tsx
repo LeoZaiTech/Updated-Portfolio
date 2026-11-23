@@ -288,7 +288,7 @@ function Footer() {
           Email
         </a>
         <a
-          href="https://github.com/LeoZai613"
+          href="https://github.com/LeoZaiTech"
           target="_blank"
           rel="noreferrer"
           className="hover:text-[color:var(--foreground)]"
